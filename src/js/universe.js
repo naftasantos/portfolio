@@ -24,11 +24,20 @@ Universe.prototype.update = function() {
 };
 
 Universe.prototype.erase = function() {
+	// stores the current transformation matrix
+	context.save();
 
+	// using the identity matrix to clear the canvas
+	context.setTransform(1, 0, 0, 1, 0, 0);
+	context.clearRect(0, 0, canvas.width, canvas.height);
+
+	// restoring the transformation matrix
+	context.restore();
 };
 
 Universe.prototype.draw = function() {
-
+	context.font = '12px Georgia';
+	context.fillText('fps: ' + this.timing.fps, 10, 15);
 };
 
 Universe.prototype.calculateTime = function() {
