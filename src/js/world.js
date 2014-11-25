@@ -1,15 +1,18 @@
 function World(){
-	this.dotRect = { "x":0, "y":0, "width":20, "height":20 }
+	this.dotRect = { "pos":new Vector(), "width":20, "height":20 }
 };
 
+World.DiffScale = 5;
+
 World.prototype.update = function(gameTime) {
-	this.dotRect.x = Input.MousePosition.x;
-	this.dotRect.y = Input.MousePosition.y;
+	var diff = Input.MousePosition.subtract(this.dotRect.pos);
+	var small = diff.multiply(World.DiffScale * gameTime.time);
+	this.dotRect.pos = this.dotRect.pos.add(small);
 };
 
 World.prototype.draw = function(context) {
-	var halfDotRect = { "x": this.dotRect.x - Math.floor(this.dotRect.width / 2),
-						"y": this.dotRect.y - Math.floor(this.dotRect.height / 2), 
+	var halfDotRect = { "x": this.dotRect.pos.x - Math.floor(this.dotRect.width / 2),
+						"y": this.dotRect.pos.y - Math.floor(this.dotRect.height / 2), 
 						"width": this.dotRect.width,
 						"height": this.dotRect.height };
 

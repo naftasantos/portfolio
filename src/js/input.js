@@ -100,7 +100,7 @@ Input.BACK_SLASH = 220;
 Input.CLOSE_BRAKET = 221;
 Input.SINGLE_QUOTE = 222;
 
-Input.MousePosition = { "x":0, "y":0 };
+Input.MousePosition = new Vector();
 
 Input.onStageKeyDown = function(evt) {
 	Input.KeysDown[evt.keyCode] = true;

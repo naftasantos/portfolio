@@ -69,4 +69,7 @@ Universe.prototype.calculateTime = function() {
 		this.timing.fps = this.timing.frameCounter;
 		this.timing.frameCounter = 0;
 	}
+
+	// this parameter should be passed along as second
+	this.timing.time /= 1000;
 };
