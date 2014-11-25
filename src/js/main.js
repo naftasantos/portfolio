@@ -1,6 +1,8 @@
 var canvas = document.getElementById('universe-content');
 var context = canvas.getContext('2d');
 
+Input.setupMouse(canvas);
+
 var content = new GameContent(canvas);
 
 var mainloop = function() {

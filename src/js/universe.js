@@ -43,13 +43,18 @@ Universe.prototype.erase = function() {
 };
 
 Universe.prototype.draw = function() {
-	context.font = '12px Georgia';
-	context.fillText('fps: ' + this.timing.fps, 10, 15);
+	// Make the canvas occupy the whole screen
+	context.canvas.width = window.innerWidth;
+	context.canvas.height = window.innerHeight;
 
 	for (var idx in this.worlds) {
 		world = this.worlds[idx];
-		world.draw();
+		world.draw(context);
 	}
+
+	context.fillStyle = "#fff";
+	context.font = '12px Georgia';
+	context.fillText('fps: ' + this.timing.fps, 10, 15);
 };
 
 Universe.prototype.calculateTime = function() {
