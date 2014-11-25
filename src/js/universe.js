@@ -2,8 +2,6 @@ function Universe(canvas){
 	this.canvas = canvas;
 	this.context = canvas.getContext('2d');
 
-	this.wor
-
 	this.timing = {
 		lastTimer: 0,
 		currentTimer: 0,
