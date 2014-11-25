@@ -1,18 +1,43 @@
-function World(){
+function World(canvas){
+	this.diffScale	= 1;
+	this.totalRects = 5;
+
 	this.dotRect = { "pos":new Vector(), "width":20, "height":20 }
+
+	this.canvas = canvas;
+	this.randomRects = World.generateRandomRects(canvas, this.totalRects);
+	this.collided = false;
 };
 
-World.DiffScale = 5;
-
 World.prototype.update = function(gameTime) {
-	var diff = Input.MousePosition.subtract(this.dotRect.pos);
-	var small = diff.multiply(World.DiffScale * gameTime.time);
-	this.dotRect.pos = this.dotRect.pos.add(small);
+
+	if(!this.collided) {
+		for (var idx in this.randomRects) {
+			rect = this.randomRects[idx];
+			if (Collision.collidesWithPoint(Input.MousePosition, rect)) {
+				this.randomRects.splice(idx, 1);
+				break;
+			}
+		}
+
+		var diff = Input.MousePosition.subtract(this.dotRect.pos);
+		var small = diff.multiply(this.diffScale * gameTime.time);
+		this.dotRect.pos = this.dotRect.pos.add(small);
+
+		if(Collision.collidesWithPoint(Input.MousePosition, this.dotRect)) {
+			this.collided = true;
+		}
+
+		if(this.randomRects.length == 0) {
+			this.randomRects = World.generateRandomRects(this.canvas, this.totalRects);
+			this.diffScale *= 1.5;
+		}
+	}
 };
 
 World.prototype.draw = function(context) {
-	var halfDotRect = { "x": this.dotRect.pos.x - Math.floor(this.dotRect.width / 2),
-						"y": this.dotRect.pos.y - Math.floor(this.dotRect.height / 2), 
+	var halfDotRect = { "x": Math.floor(this.dotRect.pos.x - (this.dotRect.width / 2)),
+						"y": Math.floor(this.dotRect.pos.y - (this.dotRect.height / 2)), 
 						"width": this.dotRect.width,
 						"height": this.dotRect.height };
 
@@ -20,4 +45,26 @@ World.prototype.draw = function(context) {
 	context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 	context.fillStyle = "#fff";
 	context.fillRect(halfDotRect.x, halfDotRect.y, halfDotRect.width, halfDotRect.height);
+
+	context.fillStyle = "#E6DB58";
+	
+	for(var idx in this.randomRects) {
+		console.log("drawn");
+		rect = this.randomRects[idx];
+		context.fillRect(rect.pos.x, rect.pos.y, rect.width, rect.height);
+	}
 };
+
+World.generateRandomRects = function(canvas, totalRects) {
+	ret = [];
+
+	for (var i = 0; i < totalRects; i++) {
+		ret.push({ 
+			"pos":new Vector(Math.floor(Math.random() * canvas.width), Math.floor(Math.random() * canvas.height)),
+			"width":20,
+			"height":20
+		});
+	}
+
+	return ret;
+}

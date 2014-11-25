@@ -1,6 +1,6 @@
 function GameContent(canvas) {
 	this.universe = new Universe(canvas)
-	this.universe.worlds.push(new World())
+	this.universe.worlds.push(new World(canvas))
 };
 
 GameContent.prototype.update = function() {

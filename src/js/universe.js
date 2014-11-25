@@ -2,6 +2,8 @@ function Universe(canvas){
 	this.canvas = canvas;
 	this.context = canvas.getContext('2d');
 
+	this.updateCanvasSize();
+
 	this.timing = {
 		lastTimer: 0,
 		currentTimer: 0,
@@ -43,9 +45,7 @@ Universe.prototype.erase = function() {
 };
 
 Universe.prototype.draw = function() {
-	// Make the canvas occupy the whole screen
-	context.canvas.width = window.innerWidth;
-	context.canvas.height = window.innerHeight;
+	this.updateCanvasSize();
 
 	for (var idx in this.worlds) {
 		world = this.worlds[idx];
@@ -72,4 +72,10 @@ Universe.prototype.calculateTime = function() {
 
 	// this parameter should be passed along as second
 	this.timing.time /= 1000;
+};
+
+Universe.prototype.updateCanvasSize = function() {
+	// Make the canvas occupy the whole screen
+	context.canvas.width = window.innerWidth;
+	context.canvas.height = window.innerHeight;
 };
