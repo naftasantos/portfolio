@@ -2,6 +2,8 @@ function Universe(canvas){
 	this.canvas = canvas;
 	this.context = canvas.getContext('2d');
 
+	this.wor
+
 	this.timing = {
 		lastTimer: 0,
 		currentTimer: 0,
@@ -13,6 +15,8 @@ function Universe(canvas){
 
 	this.timing.lastTimer = new Date().getTime();
 	this.timing.currentTimer = this.timing.lastTimer;
+
+	this.worlds = []
 };
 
 Universe.prototype.update = function() {
@@ -21,6 +25,11 @@ Universe.prototype.update = function() {
 
 	gameTime.fps = this.timing.fps;
 	gameTime.time = this.timing.time;
+
+	for (var idx in this.worlds) {
+		world = this.worlds[idx];
+		world.update(gameTime);
+	}
 };
 
 Universe.prototype.erase = function() {
@@ -38,6 +47,11 @@ Universe.prototype.erase = function() {
 Universe.prototype.draw = function() {
 	context.font = '12px Georgia';
 	context.fillText('fps: ' + this.timing.fps, 10, 15);
+
+	for (var idx in this.worlds) {
+		world = this.worlds[idx];
+		world.draw();
+	}
 };
 
 Universe.prototype.calculateTime = function() {

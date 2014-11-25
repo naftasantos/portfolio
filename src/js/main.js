@@ -1,13 +1,10 @@
 var canvas = document.getElementById('universe-content');
 var context = canvas.getContext('2d');
 
-var universe = new Universe(canvas);
+var content = new GameContent(canvas);
 
 var mainloop = function() {
-	universe.update();
-	
-	universe.erase();
-	universe.draw();
+    content.update();
 };
 
 var animFrame = window.requestAnimationFrame ||
