@@ -1,6 +1,7 @@
 function World(canvas){
 	this.diffScale	= 1;
 	this.totalRects = 5;
+	this.points = 0;
 
 	this.dotRect = { "pos":new Vector(), "width":20, "height":20 }
 
@@ -16,6 +17,7 @@ World.prototype.update = function(gameTime) {
 			rect = this.randomRects[idx];
 			if (Collision.collidesWithPoint(Input.MousePosition, rect)) {
 				this.randomRects.splice(idx, 1);
+				this.points++;
 				break;
 			}
 		}
@@ -53,6 +55,10 @@ World.prototype.draw = function(context) {
 		rect = this.randomRects[idx];
 		context.fillRect(rect.pos.x, rect.pos.y, rect.width, rect.height);
 	}
+
+	context.fillStyle = "#fff";
+	context.font = "12px Georgia";
+	context.fillText("score: " + this.points, this.canvas.width - 60, 15);
 };
 
 World.generateRandomRects = function(canvas, totalRects) {
@@ -60,7 +66,7 @@ World.generateRandomRects = function(canvas, totalRects) {
 
 	for (var i = 0; i < totalRects; i++) {
 		ret.push({ 
-			"pos":new Vector(Math.floor(Math.random() * canvas.width), Math.floor(Math.random() * canvas.height)),
+			"pos":new Vector(Math.floor(Math.random() * canvas.width - 20), Math.floor(Math.random() * canvas.height - 20)),
 			"width":20,
 			"height":20
 		});
