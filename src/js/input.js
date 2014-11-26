@@ -100,6 +100,7 @@ Input.BACK_SLASH = 220;
 Input.CLOSE_BRAKET = 221;
 Input.SINGLE_QUOTE = 222;
 
+Input.IS_MOUSE_DOWN = false;
 Input.MousePosition = new Vector();
 
 Input.onStageKeyDown = function(evt) {
@@ -115,10 +116,20 @@ document.addEventListener("keyup", Input.onStageKeyUp, false);
 
 Input.setupMouse = function(canvas) {
 	canvas.addEventListener("mousemove", Input.onMouseMove, false);
+	canvas.addEventListener("mousedown", Input.onMouseDown, false);
+	canvas.addEventListener("mouseup", Input.onMouseUp, false);
 }
 
 Input.onMouseMove = function(evt) {
 	var rect = evt.target.getBoundingClientRect();
 	Input.MousePosition.x = evt.clientX - rect.left;
 	Input.MousePosition.y = evt.clientY - rect.top;
+}
+
+Input.onMouseDown = function(evt) {
+	Input.IS_MOUSE_DOWN = true;
+}
+
+Input.onMouseUp = function(evt) {
+	Input.IS_MOUSE_DOWN = false;
 }

@@ -14,7 +14,7 @@ var animFrame = window.requestAnimationFrame ||
         window.mozRequestAnimationFrame    ||
         window.oRequestAnimationFrame      ||
         window.msRequestAnimationFrame     ||
-        null ;
+        null;
 
 if ( animFrame !== null ) {
     var recursiveAnim = function() {
