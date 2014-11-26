@@ -1,16 +1,7 @@
 function World(canvas){
-	this.diffScale	= 1;
-	this.totalRects = 5;
-	this.points = 0;
-	this.highscore = -1;
-
-	this.dotRect = { "pos":new Vector(), "width":20, "height":20 }
-
 	this.canvas = canvas;
-	this.randomRects = World.generateRandomRects(canvas, this.totalRects);
-	this.collided = false;
 
-	this.loadHighscore();
+	this.resetGame();
 };
 
 World.prototype.loadHighscore = function() {
@@ -44,32 +35,29 @@ World.prototype.highscoreReceived = function(highscore) {
 
 World.prototype.update = function(gameTime) {
 
-	if(!this.collided) {
-		for (var idx in this.randomRects) {
-			rect = this.randomRects[idx];
-			if (Collision.collidesWithPoint(Input.MousePosition, rect)) {
-				this.randomRects.splice(idx, 1);
-				this.points++;
-				break;
-			}
+	for (var idx in this.randomRects) {
+		rect = this.randomRects[idx];
+		if (Collision.collidesWithPoint(Input.MousePosition, rect)) {
+			this.randomRects.splice(idx, 1);
+			this.points++;
+			break;
 		}
+	}
 
-		var diff = Input.MousePosition.subtract(this.dotRect.pos);
-		var small = diff.multiply(this.diffScale * gameTime.time);
-		this.dotRect.pos = this.dotRect.pos.add(small);
+	var diff = Input.MousePosition.subtract(this.dotRect.pos);
+	var small = diff.multiply(this.diffScale * gameTime.time);
+	this.dotRect.pos = this.dotRect.pos.add(small);
 
-		if(Collision.collidesWithPoint(Input.MousePosition, this.dotRect)) {
-			this.collided = true;
-
-			if (this.points > this.highscore) {
-				this.saveHighscore();
-			}
+	if(Collision.collidesWithPoint(Input.MousePosition, this.dotRect)) {
+		if (this.points > this.highscore) {
+			this.saveHighscore();
 		}
+		this.resetGame();
+	}
 
-		if(this.randomRects.length == 0) {
-			this.randomRects = World.generateRandomRects(this.canvas, this.totalRects);
-			this.diffScale *= 1.5;
-		}
+	if(this.randomRects.length == 0) {
+		this.randomRects = World.generateRandomRects(this.canvas, this.totalRects);
+		this.diffScale *= 1.5;
 	}
 };
 
@@ -112,4 +100,16 @@ World.generateRandomRects = function(canvas, totalRects) {
 	}
 
 	return ret;
+}
+
+World.prototype.resetGame = function() {
+	this.diffScale	= 1;
+	this.totalRects = 5;
+	this.points 	= 0;
+	this.highscore 	= -1;
+
+	this.dotRect = { "pos":new Vector(), "width":20, "height":20 }
+
+	this.randomRects = World.generateRandomRects(canvas, this.totalRects);
+	this.loadHighscore();
 }
