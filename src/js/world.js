@@ -110,6 +110,6 @@ World.prototype.resetGame = function() {
 
 	this.dotRect = { "pos":new Vector(), "width":20, "height":20 }
 
-	this.randomRects = World.generateRandomRects(canvas, this.totalRects);
+	this.randomRects = World.generateRandomRects(this.canvas, this.totalRects);
 	this.loadHighscore();
 }
