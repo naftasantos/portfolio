@@ -2,13 +2,45 @@ function World(canvas){
 	this.diffScale	= 1;
 	this.totalRects = 5;
 	this.points = 0;
+	this.highscore = -1;
 
 	this.dotRect = { "pos":new Vector(), "width":20, "height":20 }
 
 	this.canvas = canvas;
 	this.randomRects = World.generateRandomRects(canvas, this.totalRects);
 	this.collided = false;
+
+	this.loadHighscore();
 };
+
+World.prototype.loadHighscore = function() {
+	var that = this;
+
+	$.ajax({
+		url: 'service/gethighscore.php',
+		type: 'GET'
+	})
+	.done(function(evt){
+		that.highscore = parseInt(evt);
+	});
+}
+
+World.prototype.saveHighscore = function() {
+	var that = this;
+
+	$.ajax({
+		url: 'service/savehighscore.php',
+		type: 'GET',
+		data: {'score':this.points},
+		success: function (data) {
+			that.loadHighscore();
+		}
+	});
+}
+
+World.prototype.highscoreReceived = function(highscore) {
+	this.highscore = parseInt(highscore);
+}
 
 World.prototype.update = function(gameTime) {
 
@@ -28,6 +60,10 @@ World.prototype.update = function(gameTime) {
 
 		if(Collision.collidesWithPoint(Input.MousePosition, this.dotRect)) {
 			this.collided = true;
+
+			if (this.points > this.highscore) {
+				this.saveHighscore();
+			}
 		}
 
 		if(this.randomRects.length == 0) {
@@ -51,7 +87,6 @@ World.prototype.draw = function(context) {
 	context.fillStyle = "#E6DB58";
 	
 	for(var idx in this.randomRects) {
-		console.log("drawn");
 		rect = this.randomRects[idx];
 		context.fillRect(rect.pos.x, rect.pos.y, rect.width, rect.height);
 	}
@@ -59,6 +94,10 @@ World.prototype.draw = function(context) {
 	context.fillStyle = "#fff";
 	context.font = "12px Georgia";
 	context.fillText("score: " + this.points, this.canvas.width - 60, 15);
+
+	if (this.highscore > -1) {
+		context.fillText("high score: " + this.highscore, this.canvas.width - 100, 35);
+	}
 };
 
 World.generateRandomRects = function(canvas, totalRects) {
@@ -66,7 +105,7 @@ World.generateRandomRects = function(canvas, totalRects) {
 
 	for (var i = 0; i < totalRects; i++) {
 		ret.push({ 
-			"pos":new Vector(Math.floor(Math.random() * canvas.width - 20), Math.floor(Math.random() * canvas.height - 20)),
+			"pos":new Vector(Math.floor(Math.random() * (canvas.width - 20)), Math.floor(Math.random() * (canvas.height - 20))),
 			"width":20,
 			"height":20
 		});
