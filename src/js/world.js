@@ -49,22 +49,47 @@ World.prototype.update = function(gameTime) {
 
 			for (var idx in this.randomRects) {
 				rect = this.randomRects[idx];
+				
+				if(rect.type == "special") {
+					rect.time -= gameTime.time;
+
+					if(rect.time <= 0) {
+						this.randomRects.splice(idx, 1);
+						break;
+					}
+				}
 				if((this.lastMousePos == null && Collision.collidesWithPoint(Input.MousePosition, rect)) || 
 			   	   (this.lastMousePos != null && Collision.collidesWithLine([this.lastMousePos, Input.MousePosition], rect))) {
 					this.randomRects.splice(idx, 1);
-					this.points++;
+
+					if (rect.type == "normal") {
+						this.points++;
+						this.gameTime++;
+					} else if (rect.type == "special") {
+						this.points += 2;
+						this.gameTime += 3;
+					}
 					break;
 				}
 			}
 
 			this.lastMousePos = Input.MousePosition.clone();
 
-			var tmp = new Vector(Input.MousePosition.x - this.dotRect.width / 2, Input.MousePosition.y - this.dotRect.height / 2);
-			var diff = tmp.subtract(this.dotRect.pos);
-			var small = diff.multiply(this.diffScale * gameTime.time);
-			this.dotRect.pos = this.dotRect.pos.add(small);
+			if (this.points > 0) {
+				this.gameTime -= gameTime.time;
 
-			if(Collision.collidesWithPoint(Input.MousePosition, this.dotRect)) {
+				if(this.gameTime < 0) {
+					this.gameTime = 0;
+				}
+
+				var tmp = new Vector(Input.MousePosition.x - this.dotRect.width / 2, Input.MousePosition.y - this.dotRect.height / 2);
+				var diff = tmp.subtract(this.dotRect.pos);
+				var small = diff.multiply(this.diffScale * gameTime.time);
+				this.dotRect.pos = this.dotRect.pos.add(small);
+			}
+
+			if(this.gameTime <= 0 ||
+			   Collision.collidesWithPoint(Input.MousePosition, this.dotRect)) {
 				if (this.points > this.highscore) {
 					this.saveHighscore();
 				}
@@ -72,8 +97,7 @@ World.prototype.update = function(gameTime) {
 			}
 
 			if(this.randomRects.length == 0) {
-				this.randomRects = World.generateRandomRects(this.canvas, this.totalRects);
-				this.diffScale *= 1.5;
+				this.randomRects = this.generateRandomRects(this.canvas, this.totalRects);
 			}
 			break;
 		case World.STATE_GAME_OVER:
@@ -92,59 +116,76 @@ World.prototype.draw = function(context) {
 		case World.STATE_GAME_OVER:
 			context.fillStyle = "#fff";
 			context.font = "12px Georgia";
-			context.fillText("Game Over. Press ENTER to try again", this.canvas.width / 2 - 100, this.canvas.height / 2 - 10);
+			context.fillText("Game Over. Press ENTER to try again.", this.canvas.width / 2 - 100, this.canvas.height / 2 - 10);
 		case World.STATE_GAME:
 			context.fillStyle = "#fff";
 			context.fillRect(this.dotRect.pos.x, this.dotRect.pos.y, this.dotRect.width, this.dotRect.height);
 
-			if (this.misclicktimer > 0) {
-				context.fillStyle = "#000";
-			} else {
-				context.fillStyle = "#E6DB58";
-			}
-			
 			for(var idx in this.randomRects) {
 				rect = this.randomRects[idx];
+				
+				if (this.misclicktimer > 0) {
+					context.fillStyle = "#000";
+				} else if(rect.type == "special") {
+					context.fillStyle = "#A9E175";
+				} else {
+					context.fillStyle = "#E6DB58";
+				}
+
 				context.fillRect(rect.pos.x, rect.pos.y, rect.width, rect.height);
 			}
 
 			context.fillStyle = "#fff";
 			context.font = "12px Georgia";
-			context.fillText("score: " + this.points, this.canvas.width - 60, 15);
+			context.fillText("score: " + this.points, this.canvas.width - 100, 15);
+
+			context.fillText("time: " + Math.ceil(this.gameTime), this.canvas.width - 100, 35);
 
 			if (this.highscore > -1) {
-				context.fillText("high score: " + this.highscore, this.canvas.width - 100, 35);
+				context.fillText("high score: " + this.highscore, this.canvas.width - 100, 55);
 			}
 		break;
 	}
 };
 
-World.generateRandomRects = function(canvas, totalRects) {
+World.prototype.generateRandomRects = function(canvas, totalRects) {
 	ret = [];
 
 	for (var i = 0; i < totalRects; i++) {
-		ret.push({ 
-			"pos":new Vector(Math.floor(Math.random() * (canvas.width - 20)), Math.floor(Math.random() * (canvas.height - 20))),
-			"width":20,
-			"height":20
-		});
+		ret.push(this.createSquare("normal"));
+	}
+
+	if (Math.ceil(Math.random() * 10) >= 10) {
+		// 10% chance of generating a special square
+		ret.push(this.createSquare("special"));
 	}
 
 	return ret;
 };
 
+World.prototype.createSquare = function(type){
+	return { 
+		"pos":new Vector(Math.floor(Math.random() * (canvas.width - 20)), Math.floor(Math.random() * (canvas.height - 20))),
+		"width":20,
+		"height":20,
+		"type":type,
+		"time":3
+	};
+};
+
 World.prototype.resetGame = function() {
-	this.diffScale	= 1;
-	this.totalRects = 5;
+	this.diffScale	= 11;
+	this.totalRects = 1;
 	this.points 	= 0;
 	this.highscore 	= -1;
 	this.lastMousePos = null;
 	this.misclicktimer = 0;
+	this.gameTime 	= 30;
 	
 	this.state = World.STATE_GAME;
 
 	this.dotRect = { "pos":new Vector(), "width":20, "height":20 }
 
-	this.randomRects = World.generateRandomRects(this.canvas, this.totalRects);
+	this.randomRects = this.generateRandomRects(this.canvas, this.totalRects);
 	this.loadHighscore();
 };
