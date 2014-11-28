@@ -34,6 +34,19 @@ World.prototype.saveHighscore = function() {
 	});
 };
 
+World.prototype.saveScore = function() {
+	var that = this;
+
+	$.ajax({
+		url: 'service/savescore.php',
+		type: 'POST',
+		data: {'score':this.points, 'time':this.gameTime},
+		success: function (data) {
+			//
+		}
+	});
+}
+
 World.prototype.highscoreReceived = function(highscore) {
 	this.highscore = parseInt(highscore);
 };
@@ -71,9 +84,12 @@ World.prototype.update = function(gameTime) {
 
 					this.firstHit = true;
 					
-					if (rect.type == "special") {
+					if (rect.type == "normal") {
+						this.points++;
+						this.gameTime += 0.25;
+					} else if (rect.type == "special") {
 						this.points += 2;
-						this.gameTime += 3;
+						this.gameTime += 1;
 					}
 					break;
 				}
@@ -99,12 +115,11 @@ World.prototype.update = function(gameTime) {
 				if (this.points > this.highscore) {
 					this.saveHighscore();
 				}
+				this.saveScore();
 				this.state = World.STATE_GAME_OVER;
 			}
 
 			if(this.randomRects.length == 0) {
-				this.points++;
-				this.gameTime++;
 				this.randomRects = this.generateRandomRects(this.canvas, this.totalRects);
 			}
 			break;
