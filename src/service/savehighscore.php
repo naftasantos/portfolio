@@ -1,5 +1,5 @@
 <?php
-	$score = intval($_GET['score']);
+	$score = intval($_POST['score']);
 	$saved = intval(file_get_contents("highscore.txt"));
 
 	if ($score > $saved) {

@@ -53,8 +53,8 @@ Universe.prototype.draw = function() {
 	}
 
 	context.fillStyle = "#fff";
-	context.font = '12px Georgia';
-	context.fillText('fps: ' + this.timing.fps, 10, 15);
+	context.font = '12px Courier';
+	context.fillText('> fps: ' + this.timing.fps, 10, 15);
 };
 
 Universe.prototype.calculateTime = function() {

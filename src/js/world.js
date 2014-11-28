@@ -1,6 +1,8 @@
 function World(canvas){
 	this.canvas = canvas;
-
+	this.backgroundColor = "#000";
+	this.dotColorShown = "#fff";
+	this.dotColorHidden = "#000";
 	this.resetGame();
 };
 
@@ -24,7 +26,7 @@ World.prototype.saveHighscore = function() {
 
 	$.ajax({
 		url: 'service/savehighscore.php',
-		type: 'GET',
+		type: 'POST',
 		data: {'score':this.points},
 		success: function (data) {
 			that.loadHighscore();
@@ -62,10 +64,14 @@ World.prototype.update = function(gameTime) {
 			   	   (this.lastMousePos != null && Collision.collidesWithLine([this.lastMousePos, Input.MousePosition], rect))) {
 					this.randomRects.splice(idx, 1);
 
-					if (rect.type == "normal") {
-						this.points++;
-						this.gameTime++;
-					} else if (rect.type == "special") {
+					if (!this.firstHit) {
+						this.dotRect.width 	= 20;
+						this.dotRect.height = 20;
+					}
+
+					this.firstHit = true;
+					
+					if (rect.type == "special") {
 						this.points += 2;
 						this.gameTime += 3;
 					}
@@ -75,7 +81,7 @@ World.prototype.update = function(gameTime) {
 
 			this.lastMousePos = Input.MousePosition.clone();
 
-			if (this.points > 0) {
+			if (this.firstHit) {
 				this.gameTime -= gameTime.time;
 
 				if(this.gameTime < 0) {
@@ -97,6 +103,8 @@ World.prototype.update = function(gameTime) {
 			}
 
 			if(this.randomRects.length == 0) {
+				this.points++;
+				this.gameTime++;
 				this.randomRects = this.generateRandomRects(this.canvas, this.totalRects);
 			}
 			break;
@@ -106,19 +114,30 @@ World.prototype.update = function(gameTime) {
 			}
 			break;
 	}
+
+	this.blinkTimer -= gameTime.time;
+	if (this.blinkTimer < -this.blinkTimerSize) {
+		this.blinkTimer = this.blinkTimerSize;
+	}
 };
 
 World.prototype.draw = function(context) {
-	context.fillStyle = "#000";
+	context.fillStyle = this.backgroundColor;
 	context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
 	switch(this.state){
 		case World.STATE_GAME_OVER:
 			context.fillStyle = "#fff";
-			context.font = "12px Georgia";
-			context.fillText("Game Over. Press ENTER to try again.", this.canvas.width / 2 - 100, this.canvas.height / 2 - 10);
+			context.font = "12px Courier";
+			txt = "Game Over. Press ENTER to try again.";
+			size = context.measureText(txt);
+			context.fillText(txt, this.canvas.width / 2 - size.width / 2, this.canvas.height / 2 - 10);
 		case World.STATE_GAME:
-			context.fillStyle = "#fff";
+			if(!this.firstHit && this.blinkTimer < 0) {
+				context.fillStyle = this.dotColorHidden;
+			} else {
+				context.fillStyle = this.dotColorShown;
+			}
 			context.fillRect(this.dotRect.pos.x, this.dotRect.pos.y, this.dotRect.width, this.dotRect.height);
 
 			for(var idx in this.randomRects) {
@@ -136,14 +155,16 @@ World.prototype.draw = function(context) {
 			}
 
 			context.fillStyle = "#fff";
-			context.font = "12px Georgia";
-			context.fillText("score: " + this.points, this.canvas.width - 100, 15);
+			context.font = "12px Courier";
+			context.fillText("> score: " + this.points, 10, 35);
 
-			context.fillText("time: " + Math.ceil(this.gameTime), this.canvas.width - 100, 35);
+			context.fillText("> time: " + Math.ceil(this.gameTime), 10, 55);
 
 			if (this.highscore > -1) {
-				context.fillText("high score: " + this.highscore, this.canvas.width - 100, 55);
+				context.fillText("> high score: " + this.highscore, 10, 75);
 			}
+
+			context.fillText("> ", 10, 95);
 		break;
 	}
 };
@@ -174,17 +195,20 @@ World.prototype.createSquare = function(type){
 };
 
 World.prototype.resetGame = function() {
-	this.diffScale	= 11;
-	this.totalRects = 1;
-	this.points 	= 0;
-	this.highscore 	= -1;
-	this.lastMousePos = null;
-	this.misclicktimer = 0;
-	this.gameTime 	= 30;
-	
+	this.diffScale		= 11;
+	this.totalRects 	= 3;
+	this.points 		= 0;
+	this.highscore 		= -1;
+	this.lastMousePos 	= null;
+	this.misclicktimer 	= 0;
+	this.gameTime 		= 30;
+	this.blinkTimerSize	= 0.5;
+	this.blinkTimer		= this.blinkTimerSize;
+	this.firstHit		= false;
+
 	this.state = World.STATE_GAME;
 
-	this.dotRect = { "pos":new Vector(), "width":20, "height":20 }
+	this.dotRect = { "pos":new Vector(25, 85), "width":5, "height":12 }
 
 	this.randomRects = this.generateRandomRects(this.canvas, this.totalRects);
 	this.loadHighscore();
