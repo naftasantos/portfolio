@@ -86,10 +86,10 @@ World.prototype.update = function(gameTime) {
 					
 					if (rect.type == "normal") {
 						this.points++;
-						this.gameTime += 0.25;
+						this.gameTime += 0.5;
 					} else if (rect.type == "special") {
 						this.points += 2;
-						this.gameTime += 1;
+						this.gameTime += 1.5;
 					}
 					break;
 				}
@@ -106,8 +106,9 @@ World.prototype.update = function(gameTime) {
 
 				var tmp = new Vector(Input.MousePosition.x - this.dotRect.width / 2, Input.MousePosition.y - this.dotRect.height / 2);
 				var diff = tmp.subtract(this.dotRect.pos);
-				var small = diff.multiply(this.diffScale * gameTime.time);
-				this.dotRect.pos = this.dotRect.pos.add(small);
+				var force = diff.multiply(this.diffScale);
+				var accelSecs = force.multiply(gameTime.time);
+				this.dotRect.pos = this.dotRect.pos.add(accelSecs.divide(2).multiply(this.gameTime));
 			}
 
 			if(this.gameTime <= 0 ||
@@ -210,7 +211,7 @@ World.prototype.createSquare = function(type){
 };
 
 World.prototype.resetGame = function() {
-	this.diffScale		= 11;
+	this.diffScale		= 0.5;
 	this.totalRects 	= 3;
 	this.points 		= 0;
 	this.highscore 		= -1;
