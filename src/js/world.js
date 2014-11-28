@@ -108,7 +108,7 @@ World.prototype.update = function(gameTime) {
 				var diff = tmp.subtract(this.dotRect.pos);
 				var force = diff.multiply(this.diffScale);
 				var accelSecs = force.multiply(gameTime.time);
-				this.dotRect.pos = this.dotRect.pos.add(accelSecs.divide(2).multiply(this.gameTime));
+				this.dotRect.pos = this.dotRect.pos.add(accelSecs.divide(2).multiply(gameTime.time));
 			}
 
 			if(this.gameTime <= 0 ||
@@ -211,7 +211,7 @@ World.prototype.createSquare = function(type){
 };
 
 World.prototype.resetGame = function() {
-	this.diffScale		= 0.5;
+	this.diffScale		= 1200;
 	this.totalRects 	= 3;
 	this.points 		= 0;
 	this.highscore 		= -1;
