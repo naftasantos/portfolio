@@ -42,7 +42,7 @@ World.prototype.saveScore = function() {
 	$.ajax({
 		url: 'service/savescore.php',
 		type: 'POST',
-		data: {'score':this.points, 'time':this.gameTime},
+		data: {'score':this.points},
 		success: function (data) {
 			//
 		}
@@ -61,6 +61,7 @@ World.prototype.update = function(gameTime) {
 			this.dotRect.update(gameTime);
 
 			if (this.dotRect.state == GameRectangle.STATE_HIT) {
+				this.saveScore();
 				this.state = World.STATE_GAME_OVER;
 				break;
 			}
@@ -70,7 +71,6 @@ World.prototype.update = function(gameTime) {
 				rect.update(gameTime);
 
 				if (rect.state == GameRectangle.STATE_HIT) {
-					this.gameTime += rect.timeAdd;
 					this.points += rect.points;
 
 					if (!this.firstHit) {
@@ -119,13 +119,11 @@ World.prototype.draw = function(context) {
 			context.font 		= this.textFont;
 			context.fillText("> score: " + this.points, 10, 35);
 
-			context.fillText("> time: " + Math.ceil(this.gameTime), 10, 55);
-
 			if (this.highscore > -1) {
-				context.fillText("> high score: " + this.highscore, 10, 75);
+				context.fillText("> high score: " + this.highscore, 10, 55);
 			}
 
-			context.fillText("> ", 10, 95);
+			context.fillText("> ", 10, 75);
 		break;
 	}
 
@@ -139,11 +137,10 @@ World.prototype.resetGame = function() {
 	this.totalRects 	= 3;
 	this.points 		= 0;
 	this.misclicktimer 	= 0;
-	this.gameTime 		= 30;
 	this.firstHit		= false;
 
 	this.state 			= World.STATE_GAME;
-	this.dotRect 		= GameRectangle.createFollowerRect();
+	this.dotRect 		= FollowerRectangle.createRectangle();
 	this.randomRects 	= GameRectangle.createRandomRects(this.totalRects, this.canvas);
 
 	this.loadHighscore();
