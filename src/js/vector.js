@@ -113,6 +113,14 @@ Vector.unit = function(a, b) {
 Vector.fromAngles = function(theta, phi) {
   return new Vector(Math.cos(theta) * Math.cos(phi), Math.sin(phi), Math.sin(theta) * Math.cos(phi));
 };
+Vector.fromAngles2d = function(angle, size) {
+  return new Vector(Math.cos(angle) * size, Math.sin(angle) * size, 0);
+};
+Vector.randomDirection2d = function() {
+  degree = Math.round(Math.random() * 360);
+  radian = degree * (Math.PI / 180);
+  return Vector.fromAngles(radian, 1);
+};
 Vector.randomDirection = function() {
   return Vector.fromAngles(Math.random() * Math.PI * 2, Math.asin(Math.random() * 2 - 1));
 };

@@ -61,8 +61,7 @@ World.prototype.update = function(gameTime) {
 			this.dotRect.update(gameTime);
 
 			if (this.dotRect.state == GameRectangle.STATE_HIT) {
-				this.saveScore();
-				this.state = World.STATE_GAME_OVER;
+				this.gameOver();
 				break;
 			}
 
@@ -83,8 +82,30 @@ World.prototype.update = function(gameTime) {
 				}
 			}
 
+			if (this.firstHit) {
+				this.enemyTimeoutCounter -= gameTime.time;
+
+				if(this.enemyTimeoutCounter <= 0) {
+					this.enemies.push(EnemyRectangle.createRandomRectangle(this.canvas));
+					this.enemyTimeoutCounter = this.randomEnemyTimeout();
+				}
+			}
+
 			if(this.randomRects.length == 0) {
 				this.randomRects = GameRectangle.createRandomRects(this.totalRects, this.canvas);
+			}
+
+			for (var idx in this.enemies) {
+				var enemy = this.enemies[idx];
+				enemy.update(gameTime);
+
+				if(enemy.state == GameRectangle.STATE_HIT) {
+					this.gameOver();
+					break;
+				} else if (enemy.state == GameRectangle.STATE_DEAD) {
+					this.enemies.splice(idx, 1);
+					break;
+				}
 			}
 			break;
 		case World.STATE_GAME_OVER:
@@ -115,6 +136,11 @@ World.prototype.draw = function(context) {
 				rect.draw(context);
 			}
 
+			for (var idx in this.enemies) {
+				var enemy = this.enemies[idx];
+				enemy.draw(context);
+			}
+
 			context.fillStyle 	= this.textColor;
 			context.font 		= this.textFont;
 			context.fillText("> score: " + this.points, 10, 35);
@@ -133,15 +159,32 @@ World.prototype.draw = function(context) {
 	context.fillText("> fps: " + this.fps, 10, 15);
 };
 
+World.prototype.gameOver = function() {
+	this.saveScore();
+
+	if (this.points > this.highscore) {
+		this.saveHighscore();
+	}
+
+	this.state = World.STATE_GAME_OVER;
+}
+
 World.prototype.resetGame = function() {
 	this.totalRects 	= 3;
 	this.points 		= 0;
 	this.misclicktimer 	= 0;
 	this.firstHit		= false;
+	this.enemyTimeoutCounter = this.randomEnemyTimeout();
 
 	this.state 			= World.STATE_GAME;
 	this.dotRect 		= FollowerRectangle.createRectangle();
 	this.randomRects 	= GameRectangle.createRandomRects(this.totalRects, this.canvas);
+	this.enemies		= [];
 
 	this.loadHighscore();
+};
+
+World.prototype.randomEnemyTimeout = function(){
+	// from 1 to 5 seconds
+	return Math.ceil(Math.random() * 5);
 };

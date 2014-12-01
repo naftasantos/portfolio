@@ -60,11 +60,11 @@ FollowerRectangle.prototype.update = function(gameTime) {
 			// can count the points
 			this.state = FollowerRectangle.STATE_DYING;
 			break;
-		case FollowerRectangle.STATE_DYING:
+		case GameRectangle.STATE_DYING:
 			// no dying animation as for now
 			this.state = FollowerRectangle.STATE_DEAD;
 			break;
-		case FollowerRectangle.STATE_DEAD:
+		case GameRectangle.STATE_DEAD:
 			break;
 	}
 };
