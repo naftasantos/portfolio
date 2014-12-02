@@ -19,12 +19,29 @@ EnemyRectangle.createRandomRectangle = function(canvas) {
 	var pos = new Vector(0, 0);
 	var size = new Vector(10, 10);
 
-	if (Math.round(Math.random()) % 2) {
-		pos.x = canvas.width;
-		pos.y = Math.random() * canvas.width - size.x;
-	} else {
-		pos.x = Math.random() * canvas.height - size.y;
-		pos.y = canvas.height;
+	var rand = Math.round(Math.random() * 3);
+	console.log(rand);
+	switch(rand){
+		case 0:
+			// left
+			pos.x = -size.x;
+			pos.y = Math.random() * canvas.height - size.x;
+			break;
+		case 1:
+			// right
+			pos.x = canvas.width;
+			pos.y = Math.random() * canvas.height - size.x;
+			break;
+		case 2:
+			// top
+			pos.x = Math.random() * canvas.width - size.x;
+			pos.y = -size.y;
+			break;
+		case 3:
+			// bottom
+			pos.x = Math.random() * canvas.width - size.x;
+			pos.y = canvas.height;
+			break;
 	}
 
 	var ret = new EnemyRectangle(pos.x, pos.y, size.x, size.y, canvas);

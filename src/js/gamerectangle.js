@@ -12,6 +12,8 @@ GameRectangle.STATE_HIT		= "GameRectangle_STATE_HIT";
 GameRectangle.STATE_DYING	= "GameRectangle_STATE_DYING";
 GameRectangle.STATE_DEAD	= "GameRectangle_STATE_DEAD";
 
+GameRectangle.MisclickTimer = 3;
+
 GameRectangle.createRandomRects = function(totalRects, canvas) {
 	ret = [];
 
