@@ -4,7 +4,7 @@ function EnemyRectangle(x, y, width, height, canvas) {
 	this.height 		= height;
 	this.lastMousePos 	= null;
 	this.misclickTimer 	= 0;
-	this.forceSize 		= 6000;
+	this.forceSize 		= 12000;
 	this.mass			= 1;
 	this.direction		= new Vector();
 	this.canvas			= canvas;

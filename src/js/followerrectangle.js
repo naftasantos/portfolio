@@ -4,7 +4,7 @@ function FollowerRectangle(x, y, width, height) {
 	this.height 		= height;
 	this.lastMousePos 	= null;
 	this.misclickTimer 	= 0;
-	this.forceSize 		= 60000;
+	this.forceSize 		= 8;
 	this.blinkTimerSize	= 0.5;
 	this.blinkTimer		= this.blinkTimerSize;
 
@@ -36,8 +36,9 @@ FollowerRectangle.prototype.update = function(gameTime) {
 			var diff = tmp.subtract(this.pos);
 			//var force = diff.multiply(this.forceSize);
 			var force = diff.unit().multiply(this.forceSize);
-			var accelSecs = force.multiply(gameTime.time);
-			this.pos = this.pos.add(accelSecs.divide(2).multiply(gameTime.time));
+			//var accelSecs = force.multiply(gameTime.time);
+			//this.pos = this.pos.add(accelSecs.divide(2).multiply(gameTime.time));
+			this.pos = this.pos.add(force);
 
 			if(this.misclickTimer > 0) {
 				this.misclickTimer -= gameTime.time;

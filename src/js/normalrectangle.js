@@ -1,10 +1,14 @@
 function NormalRectangle(x, y, width, height) {
 	this.pos 	= new Vector(x, y);
-	this.width 	= width;
-	this.height = height;
+	this.initialPos = null;
+	this.width 	= 0;
+	this.height = 0;
+	this.size = width;
 	this.lastMousePos = null;
 	this.misclickTimer = 0;
 	this.points = 1;
+	this.showAnimationTotalTime = 0.15;
+	this.showAnimationTime = this.showAnimationTotalTime;
 
 	this.state = GameRectangle.STATE_SHOWING;
 };
@@ -19,8 +23,23 @@ NormalRectangle.createRectangle = function() {
 NormalRectangle.prototype.update = function(gameTime) {
 	switch(this.state) {
 		case GameRectangle.STATE_SHOWING:
-			// no showing animation as for now
-			this.state = GameRectangle.STATE_NORMAL;
+			if (this.initialPos == null) {
+				this.initialPos = this.pos.clone();
+			}
+
+			this.showAnimationTime -= gameTime.time;
+			size = this.size * (1 - (this.showAnimationTime / this.showAnimationTotalTime));
+			this.pos.x = this.initialPos.x - size / 2;
+			this.pos.y = this.initialPos.y - size / 2;
+			this.width = Math.ceil(size);
+			this.height = Math.ceil(size);
+
+			if (this.showAnimationTime <= 0) {
+				this.state = GameRectangle.STATE_NORMAL;
+				this.width 	= this.size;
+				this.height = this.size;
+				this.showAnimationTime = this.showAnimationTotalTime;
+			}
 			break;
 		case GameRectangle.STATE_NORMAL:
 			if(this.misclickTimer > 0) {
@@ -40,11 +59,23 @@ NormalRectangle.prototype.update = function(gameTime) {
 
 			break;
 		case GameRectangle.STATE_HIT:
-				this.state = GameRectangle.STATE_DYING;
+			this.state = GameRectangle.STATE_DYING;
 			break;
 		case GameRectangle.STATE_DYING:
-			// no dying animation as for now
-			this.state = GameRectangle.STATE_DEAD;
+			this.showAnimationTime -= gameTime.time;
+			size = this.size * (this.showAnimationTime / this.showAnimationTotalTime);
+			this.pos.x = this.initialPos.x - size / 2;
+			this.pos.y = this.initialPos.y - size / 2;
+			this.width = Math.ceil(size);
+			this.height = Math.ceil(size);
+
+			if (this.showAnimationTime <= 0) {
+				this.state = GameRectangle.STATE_DEAD;
+				this.width 	= this.size;
+				this.height = this.size;
+				this.initialPos = null;
+				this.showAnimationTime = this.showAnimationTotalTime;
+			}
 			break;
 		case GameRectangle.STATE_DEAD:
 			break;

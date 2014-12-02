@@ -19,16 +19,18 @@ GameRectangle.createRandomRects = function(totalRects, canvas) {
 
 	for (var i = 0; i < totalRects; i++) {
 		var obj = NormalRectangle.createRectangle();
-		obj.pos.x = Math.floor(Math.random() * (canvas.width - obj.width));
-		obj.pos.y = Math.floor(Math.random() * (canvas.height - obj.height));
+
+		obj.pos.x = obj.size + Math.floor(Math.random() * (canvas.width - obj.size * 2));
+		obj.pos.y = obj.size + Math.floor(Math.random() * (canvas.height - obj.size * 2));
 		ret.push(obj);
 	}
 
 	if (Math.ceil(Math.random() * 10) >= 10) {
 		// 10% chance of generating a special square
 		var obj = SpecialRectangle.createRectangle();
-		obj.pos.x = Math.floor(Math.random() * (canvas.width - obj.width));
-		obj.pos.y = Math.floor(Math.random() * (canvas.height - obj.height));
+		obj.pos.x = obj.size + Math.floor(Math.random() * (canvas.width - obj.size * 2));
+		obj.pos.y = obj.size + Math.floor(Math.random() * (canvas.height - obj.size * 2));
+		console.log(obj);
 		ret.push(obj);
 	}
 

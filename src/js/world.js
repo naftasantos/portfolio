@@ -5,6 +5,7 @@ function World(canvas){
 	this.textFont = "12px Courier";
 	this.fps = 0;
 	this.highscore = -1;
+	this.wasMouseDown = false;
 	this.resetGame();
 };
 
@@ -111,7 +112,11 @@ World.prototype.update = function(gameTime) {
 		case World.STATE_GAME_OVER:
 			if (Input.KeysDown[Input.ENTER]) {
 				this.resetGame();
+			} else if (this.wasMouseDown && !Input.IS_MOUSE_DOWN) {
+				this.resetGame();
 			}
+
+			this.wasMouseDown = Input.IS_MOUSE_DOWN;
 			break;
 	}
 };
@@ -125,7 +130,7 @@ World.prototype.draw = function(context) {
 			context.fillStyle 	= this.textColor;
 			context.font 		= this.textFont;
 
-			txt = "Game Over. Press ENTER to try again.";
+			txt = "Game Over. Press ENTER or CLICK to try again.";
 			size = context.measureText(txt);
 			context.fillText(txt, Math.floor(this.canvas.width / 2 - size.width / 2), Math.floor(this.canvas.height / 2 - 10));
 		case World.STATE_GAME:
