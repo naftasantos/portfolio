@@ -20,7 +20,7 @@ EnemyRectangle.createRandomRectangle = function(canvas) {
 	var size = new Vector(10, 10);
 
 	var rand = Math.round(Math.random() * 3);
-	console.log(rand);
+	
 	switch(rand){
 		case 0:
 			// left
