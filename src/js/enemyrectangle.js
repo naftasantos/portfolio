@@ -4,7 +4,7 @@ function EnemyRectangle(x, y, width, height, canvas) {
 	this.height 		= height;
 	this.lastMousePos 	= null;
 	this.misclickTimer 	= 0;
-	this.forceSize 		= 12000;
+	this.forceSize 		= 6000;
 	this.mass			= 1;
 	this.direction		= new Vector();
 	this.canvas			= canvas;
@@ -87,11 +87,11 @@ EnemyRectangle.prototype.update = function(gameTime) {
 		case GameRectangle.STATE_HIT:
 			// this state will remain just for one frame, so that the world
 			// can count the points
-			this.state = EnemyRectangle.STATE_DYING;
+			this.state = GameRectangle.STATE_DYING;
 			break;
 		case GameRectangle.STATE_DYING:
 			// no dying animation as for now
-			this.state = EnemyRectangle.STATE_DEAD;
+			this.state = GameRectangle.STATE_DEAD;
 			break;
 		case GameRectangle.STATE_DEAD:
 			break;

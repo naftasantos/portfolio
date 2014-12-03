@@ -59,7 +59,7 @@ World.prototype.update = function(gameTime) {
 
 	switch(this.state) {
 		case World.STATE_GAME:
-			this.dotRect.update(gameTime);
+			//this.dotRect.update(gameTime);
 
 			if (this.dotRect.state == GameRectangle.STATE_HIT) {
 				this.gameOver();
@@ -92,10 +92,6 @@ World.prototype.update = function(gameTime) {
 				}
 			}
 
-			if(this.randomRects.length == 0) {
-				this.randomRects = GameRectangle.createRandomRects(this.totalRects, this.canvas);
-			}
-
 			for (var idx in this.enemies) {
 				var enemy = this.enemies[idx];
 				enemy.update(gameTime);
@@ -106,7 +102,29 @@ World.prototype.update = function(gameTime) {
 				} else if (enemy.state == GameRectangle.STATE_DEAD) {
 					this.enemies.splice(idx, 1);
 					break;
+				} else if (enemy.state == GameRectangle.STATE_NORMAL) {
+					if (Collision.collidesWithRect(enemy, this.dotRect)) {
+						enemy.state = GameRectangle.STATE_DYING;
+						break;
+					}
+
+					for (var x in this.randomRects){
+						tmpRect = this.randomRects[x];
+
+						if(Collision.collidesWithRect(enemy, tmpRect)) {
+							tmpRect.state = GameRectangle.STATE_DYING;
+							var reflection = Collision.getReflection(tmpRect, enemy, enemy.direction);
+
+							if (reflection != null) {
+								enemy.direction = reflection;
+							}
+						}
+					}
 				}
+			}
+
+			if(this.randomRects.length == 0) {
+				this.randomRects = GameRectangle.createRandomRects(this.totalRects, this.canvas);
 			}
 			break;
 		case World.STATE_GAME_OVER:

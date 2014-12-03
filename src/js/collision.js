@@ -40,3 +40,39 @@ Collision.collidesWithLine = function(lineA, rectB) {
 
     return true;
 }
+
+Collision.getReflection = function(rectA, rectB, direction) {
+    // detecting which face has it collided with
+    var lineA = [ {"x": rectA.pos.x, "y": rectA.pos.y }, { "x": rectA.pos.x + rectA.width, "y": rectA.pos.y } ];
+    var lineB = [ {"x": rectA.pos.x + rectA.width, "y": rectA.pos.y }, { "x": rectA.pos.x + rectA.width, "y": rectA.pos.y + rectA.height } ];
+    var lineC = [ {"x": rectA.pos.x, "y": rectA.pos.y + rectA.height }, { "x": rectA.pos.x + rectA.width, "y": rectA.pos.y + rectA.height } ];
+    var lineD = [ {"x": rectA.pos.x, "y": rectA.pos.y }, { "x": rectA.pos.x, "y": rectA.pos.y + rectA.height } ];
+
+    var collidedLine = null;
+
+    if (Collision.collidesWithLine(lineA, rectB)) {
+        collidedLine = lineA;
+    } else if (Collision.collidesWithLine(lineB, rectB)) {
+        collidedLine = lineB;
+    } else if (Collision.collidesWithLine(lineC, rectB)) {
+        collidedLine = lineC;
+    } else if (Collision.collidesWithLine(lineD, rectB)) {
+        collidedLine = lineD;
+    }
+
+    if (collidedLine != null) {
+        // calculating the normal of the collided line
+        var diffX   = collidedLine[1].x - collidedLine[0].x;
+        var diffY   = collidedLine[1].y - collidedLine[0].y;
+        var normal  = new Vector(-diffY, diffX).unit();
+
+        // r = d - (2(d dot n)) * n
+        var reflection = direction.subtract(normal.multiply(direction.dot(normal) * 2));
+
+        return reflection.unit();
+    } else {
+        console.log("Something is wrong. No face collided. =/");
+    }
+
+    return null;
+}

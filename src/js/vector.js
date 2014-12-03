@@ -44,6 +44,9 @@ Vector.prototype = {
   length: function() {
     return Math.sqrt(this.dot(this));
   },
+  lengthSqr:function() {
+    return this.dot(this);
+  },
   unit: function() {
     return this.divide(this.length());
   },
