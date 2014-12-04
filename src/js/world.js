@@ -59,7 +59,7 @@ World.prototype.update = function(gameTime) {
 
 	switch(this.state) {
 		case World.STATE_GAME:
-			//this.dotRect.update(gameTime);
+			this.dotRect.update(gameTime);
 
 			if (this.dotRect.state == GameRectangle.STATE_HIT) {
 				this.gameOver();
@@ -113,10 +113,19 @@ World.prototype.update = function(gameTime) {
 
 						if(Collision.collidesWithRect(enemy, tmpRect)) {
 							tmpRect.state = GameRectangle.STATE_DYING;
-							var reflection = Collision.getReflection(tmpRect, enemy, enemy.direction);
+						}
+					}
 
-							if (reflection != null) {
-								enemy.direction = reflection;
+					for (var y in this.enemies) {
+						var tmpEnemy = this.enemies[y];
+
+						if (tmpEnemy != enemy) {
+							if (Collision.collidesWithRect(tmpEnemy, enemy)) {
+								var reflection = Collision.getReflection(tmpEnemy, enemy, enemy.direction);
+
+								if (reflection != null) {
+									enemy.direction = reflection;
+								}
 							}
 						}
 					}
@@ -209,5 +218,5 @@ World.prototype.resetGame = function() {
 
 World.prototype.randomEnemyTimeout = function(){
 	// from 1 to 5 seconds
-	return Math.ceil(Math.random() * 5);
+	return Math.ceil(Math.random() * 1);
 };

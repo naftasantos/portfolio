@@ -20,10 +20,10 @@ GameRectangle.createRandomRects = function(totalRects, canvas) {
 	for (var i = 0; i < totalRects; i++) {
 		var obj = NormalRectangle.createRectangle();
 
-		//obj.pos.x = obj.size + Math.floor(Math.random() * (canvas.width - obj.size * 2));
-		//obj.pos.y = obj.size + Math.floor(Math.random() * (canvas.height - obj.size * 2));
-		obj.pos.x = canvas.width / 2;
-		obj.pos.y = canvas.height / 2;
+		obj.pos.x = obj.size + Math.floor(Math.random() * (canvas.width - obj.size * 2));
+		obj.pos.y = obj.size + Math.floor(Math.random() * (canvas.height - obj.size * 2));
+		//obj.pos.x = canvas.width / 2;
+		//obj.pos.y = canvas.height / 2;
 		ret.push(obj);
 	}
 

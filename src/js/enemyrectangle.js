@@ -8,6 +8,7 @@ function EnemyRectangle(x, y, width, height, canvas) {
 	this.mass			= 1;
 	this.direction		= new Vector();
 	this.canvas			= canvas;
+	this.force 			= new Vector();
 
 	this.state = GameRectangle.STATE_SHOWING;
 };
@@ -57,8 +58,8 @@ EnemyRectangle.prototype.update = function(gameTime) {
 			this.state = GameRectangle.STATE_NORMAL;
 			break;
 		case GameRectangle.STATE_NORMAL:
-			var force = this.direction.multiply(this.forceSize);
-			var accelSecs = force.divide(this.mass).multiply(gameTime.time);
+			this.force = this.direction.multiply(this.forceSize);
+			var accelSecs = this.force.divide(this.mass).multiply(gameTime.time);
 			this.pos = this.pos.add(accelSecs.divide(2).multiply(gameTime.time));
 
 			if(this.misclickTimer > 0) {
@@ -116,4 +117,10 @@ EnemyRectangle.prototype.draw = function(context) {
 	}
 
 	context.fillRect(Math.floor(this.pos.x), Math.floor(this.pos.y), Math.floor(this.width), Math.floor(this.height));
+
+	/*context.beginPath();
+	context.moveTo(Math.floor(this.pos.x) + Math.floor(this.width / 2), Math.floor(this.pos.y) + Math.floor(this.height / 2));
+	context.lineTo(Math.floor(this.pos.x + this.force.x), Math.floor(this.pos.y + this.force.y));
+	context.strokeStyle = "#E6DB58";
+	context.stroke();*/
 };
