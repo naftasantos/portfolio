@@ -4,7 +4,7 @@ function EnemyRectangle(x, y, width, height, canvas) {
 	this.height 		= height;
 	this.lastMousePos 	= null;
 	this.misclickTimer 	= 0;
-	this.forceSize 		= 6000;
+	this.forceSize 		= 12000;
 	this.mass			= 1;
 	this.direction		= new Vector();
 	this.canvas			= canvas;
@@ -58,9 +58,7 @@ EnemyRectangle.prototype.update = function(gameTime) {
 			this.state = GameRectangle.STATE_NORMAL;
 			break;
 		case GameRectangle.STATE_NORMAL:
-			this.force = this.direction.multiply(this.forceSize);
-			var accelSecs = this.force.divide(this.mass).multiply(gameTime.time);
-			this.pos = this.pos.add(accelSecs.divide(2).multiply(gameTime.time));
+			this.calculateForce(gameTime.time);
 
 			if(this.misclickTimer > 0) {
 				this.misclickTimer -= gameTime.time;
@@ -117,10 +115,24 @@ EnemyRectangle.prototype.draw = function(context) {
 	}
 
 	context.fillRect(Math.floor(this.pos.x), Math.floor(this.pos.y), Math.floor(this.width), Math.floor(this.height));
-
-	/*context.beginPath();
-	context.moveTo(Math.floor(this.pos.x) + Math.floor(this.width / 2), Math.floor(this.pos.y) + Math.floor(this.height / 2));
-	context.lineTo(Math.floor(this.pos.x + this.force.x), Math.floor(this.pos.y + this.force.y));
-	context.strokeStyle = "#E6DB58";
+	/*var tmp = this.direction.multiply(20);
+	context.beginPath();
+	//context.moveTo(Math.floor(this.pos.x) + Math.floor(this.width / 2), Math.floor(this.pos.y) + Math.floor(this.height / 2));
+	//context.lineTo(Math.floor(this.pos.x + this.width / 2 + tmp.x), Math.floor(this.pos.y + this.height / 2 + tmp.y));
+	context.moveTo(Math.floor(this.pos.x), Math.floor(this.pos.y));
+	context.lineTo(Math.floor(this.pos.x + tmp.x), Math.floor(this.pos.y + tmp.y));
+	context.moveTo(Math.floor(this.pos.x + this.width), Math.floor(this.pos.y + this.height));
+	context.lineTo(Math.floor(this.pos.x + this.width + tmp.x), Math.floor(this.pos.y + this.height + tmp.y));
+	context.moveTo(Math.floor(this.pos.x + this.width), Math.floor(this.pos.y));
+	context.lineTo(Math.floor(this.pos.x + this.width + tmp.x), Math.floor(this.pos.y + tmp.y));
+	context.moveTo(Math.floor(this.pos.x), Math.floor(this.pos.y + this.height));
+	context.lineTo(Math.floor(this.pos.x + tmp.x), Math.floor(this.pos.y + this.height + tmp.y));
+	context.strokeStyle = "#E6DB58"
 	context.stroke();*/
 };
+
+EnemyRectangle.prototype.calculateForce = function(elapsed) {
+	this.force = this.direction.multiply(this.forceSize);
+	var accelSecs = this.force.divide(this.mass).multiply(elapsed);
+	this.pos = this.pos.add(accelSecs.divide(2).multiply(elapsed));
+}

@@ -1,16 +1,16 @@
 function Collision() {
 	
-}
+};
 
 Collision.collidesWithPoint = function(pointA, rectB) {
 	return pointA.x > rectB.pos.x && pointA.x < rectB.pos.x + rectB.width &&
 		   pointA.y > rectB.pos.y && pointA.y < rectB.pos.y + rectB.height;
-}
+};
 
 Collision.collidesWithRect = function(rectA, rectB) {
 	return rectA.pos.x < rectB.pos.x + rectB.width && rectA.pos.x + rectA.width > rectB.pos.x &&
 		   rectA.pos.y < rectB.pos.y + rectB.height && rectA.pos.y + rectA.height > rectB.pos.y;
-}
+};
 
 Collision.collidesWithLine = function(lineA, rectB) {
 	var diffX = (lineA[1].x - lineA[0].x);
@@ -39,26 +39,38 @@ Collision.collidesWithLine = function(lineA, rectB) {
         return false;
 
     return true;
+};
+
+Collision.adjustPosition = function(rect, other, lastPos, gameTime) {
+    // using bisect search to find the nearest collision position
+    var notCollidedPos = lastPos;
+    var result = notCollidedPos;
+    // will divide the time by half
+    var root = 0.5;
+
+    for (var i=0; i < 5; i++) {
+        // returning to the last frame position
+        rect.pos = notCollidedPos;
+        // advancing some time
+        rect.calculateForce(gameTime.time * root);
+
+        // verifies if collision happens
+        if (Collision.collidesWithRect(rect, other)) {
+            // if so, go more back in time
+            root *= 0.5;
+        } else {
+            result = rect.pos.clone();
+            // if not, advance a little bit more to the future
+            root *= 1.5;
+        }
+    }
+
+    rect.pos = result;
 }
 
 Collision.getReflection = function(rectA, rectB, direction) {
     // detecting which face has it collided with
-    var lineA = [ {"x": rectA.pos.x, "y": rectA.pos.y }, { "x": rectA.pos.x + rectA.width, "y": rectA.pos.y } ];
-    var lineB = [ {"x": rectA.pos.x + rectA.width, "y": rectA.pos.y }, { "x": rectA.pos.x + rectA.width, "y": rectA.pos.y + rectA.height } ];
-    var lineC = [ {"x": rectA.pos.x, "y": rectA.pos.y + rectA.height }, { "x": rectA.pos.x + rectA.width, "y": rectA.pos.y + rectA.height } ];
-    var lineD = [ {"x": rectA.pos.x, "y": rectA.pos.y }, { "x": rectA.pos.x, "y": rectA.pos.y + rectA.height } ];
-
-    var collidedLine = null;
-
-    if (Collision.collidesWithLine(lineA, rectB)) {
-        collidedLine = lineA;
-    } else if (Collision.collidesWithLine(lineB, rectB)) {
-        collidedLine = lineB;
-    } else if (Collision.collidesWithLine(lineC, rectB)) {
-        collidedLine = lineC;
-    } else if (Collision.collidesWithLine(lineD, rectB)) {
-        collidedLine = lineD;
-    }
+    var collidedLine = Collision.getNearestToCollisionFace(rectA, rectB);
 
     if (collidedLine != null) {
         // calculating the normal of the collided line
@@ -75,4 +87,45 @@ Collision.getReflection = function(rectA, rectB, direction) {
     }
 
     return null;
+};
+
+Collision.getNearestToCollisionFace = function(rectA, rectB) {
+    var facesA = [ 
+        // top face
+        [ {"x": rectA.pos.x, "y": rectA.pos.y }, { "x": rectA.pos.x + rectA.width, "y": rectA.pos.y } ],
+        // right face
+        [ {"x": rectA.pos.x + rectA.width, "y": rectA.pos.y }, { "x": rectA.pos.x + rectA.width, "y": rectA.pos.y + rectA.height } ],
+        // bottom face
+        [ {"x": rectA.pos.x, "y": rectA.pos.y + rectA.height }, { "x": rectA.pos.x + rectA.width, "y": rectA.pos.y + rectA.height }],
+        // left face
+        [ {"x": rectA.pos.x, "y": rectA.pos.y }, { "x": rectA.pos.x, "y": rectA.pos.y + rectA.height } ] 
+    ];
+
+    var facesB = [
+        // bottom face
+        [ {"x": rectB.pos.x, "y": rectB.pos.y + rectB.height }, { "x": rectB.pos.x + rectB.width, "y": rectB.pos.y + rectB.height }],
+        // left face
+        [ {"x": rectB.pos.x, "y": rectB.pos.y }, { "x": rectB.pos.x, "y": rectB.pos.y + rectB.height } ],
+        // top face
+        [ {"x": rectB.pos.x, "y": rectB.pos.y }, { "x": rectB.pos.x + rectB.width, "y": rectB.pos.y } ],
+        // right face
+        [ {"x": rectB.pos.x + rectB.width, "y": rectB.pos.y }, { "x": rectB.pos.x + rectB.width, "y": rectB.pos.y + rectB.height } ],
+    ]
+
+    var diffs = [
+        Math.abs(facesB[0][0].y - facesA[0][0].y),
+        Math.abs(facesB[1][0].x - facesA[1][0].x),
+        Math.abs(facesB[2][0].y - facesA[2][0].y),
+        Math.abs(facesB[3][0].x - facesA[3][0].x)
+    ]
+
+    var smallest = 0;
+
+    for (var i=1; i<4; i++) {
+        if(diffs[i] < diffs[smallest]) {
+            smallest = i;
+        }
+    }
+
+    return facesB[smallest];
 }

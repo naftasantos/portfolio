@@ -92,8 +92,10 @@ World.prototype.update = function(gameTime) {
 				}
 			}
 
-			for (var idx in this.enemies) {
+			var enemiesLen = this.enemies.length;
+			for (var idx=0; idx < enemiesLen; idx++) {
 				var enemy = this.enemies[idx];
+				var lastPos = enemy.pos.clone();
 				enemy.update(gameTime);
 
 				if(enemy.state == GameRectangle.STATE_HIT) {
@@ -116,15 +118,24 @@ World.prototype.update = function(gameTime) {
 						}
 					}
 
-					for (var y in this.enemies) {
+					//for (var y in this.enemies) {
+					for(var y=idx+1; y < enemiesLen; y++){
 						var tmpEnemy = this.enemies[y];
 
 						if (tmpEnemy != enemy) {
 							if (Collision.collidesWithRect(tmpEnemy, enemy)) {
+								Collision.adjustPosition(enemy, tmpEnemy, lastPos, gameTime);
+
 								var reflection = Collision.getReflection(tmpEnemy, enemy, enemy.direction);
 
 								if (reflection != null) {
 									enemy.direction = reflection;
+								}
+
+								reflection = Collision.getReflection(enemy, tmpEnemy, tmpEnemy.direction);
+
+								if (reflection != null) {
+									tmpEnemy.direction = reflection;
 								}
 							}
 						}
@@ -217,6 +228,6 @@ World.prototype.resetGame = function() {
 };
 
 World.prototype.randomEnemyTimeout = function(){
-	// from 1 to 5 seconds
-	return Math.ceil(Math.random() * 1);
+	// from 1 to 2 seconds
+	return Math.ceil(Math.random() * 2);
 };
