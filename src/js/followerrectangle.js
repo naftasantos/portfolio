@@ -4,7 +4,7 @@ function FollowerRectangle(x, y, width, height) {
 	this.height 		= height;
 	this.lastMousePos 	= null;
 	this.misclickTimer 	= 0;
-	this.forceSize 		= 80000;
+	this.forceSize 		= 70000;
 	this.blinkTimerSize	= 0.5;
 	this.blinkTimer		= this.blinkTimerSize;
 
