@@ -69,12 +69,22 @@ Collision.adjustPosition = function(rect, other, lastPos, gameTime) {
 }
 
 Collision.getResultingCollisionForce = function(rectA, rectB, direction) {
-    var result = rectB.direction.add(rectA.direction);
+    var normal = rectB.direction.subtract(rectA.direction).unit();
+    var reflection = rectB.direction.subtract(normal.multiply(rectB.direction.dot(normal) * 2));
+    return reflection.unit();
+
+    /*var centerA = new Vector(rectA.pos.x - rectA.width / 2, rectA.pos.y - rectA.height / 2);
+    var centerB = new Vector(rectB.pos.x - rectB.width / 2, rectB.pos.y - rectB.height / 2);
+
+    var normal = centerB.subtract(centerA).unit();
+    var reflection = rectB.direction.subtract(normal.multiply(rectB.direction.dot(normal) * 2));
+    return reflection.unit();*/
+
+    /*var result = rectB.direction.add(rectA.direction);
     var invertA = rectA.direction.multiply(-1);
     var invertB = rectB.direction.multiply(-1);
 
-    return invertB.add(result).unit();
-
+    return invertB.add(result).unit();*/
 
     // detecting which face has it collided with
     /*var collidedLine = Collision.getNearestToCollisionFace(rectA, rectB);
