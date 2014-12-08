@@ -9,6 +9,7 @@ function EnemyRectangle(x, y, width, height, canvas) {
 	this.direction		= new Vector();
 	this.canvas			= canvas;
 	this.force 			= new Vector();
+	this.colorShown 	= EnemyRectangle.ColorShown;
 
 	this.state = GameRectangle.STATE_SHOWING;
 };
@@ -100,7 +101,7 @@ EnemyRectangle.prototype.update = function(gameTime) {
 EnemyRectangle.prototype.draw = function(context) {
 	switch(this.state) {
 		case GameRectangle.STATE_SHOWING:
-			context.fillStyle = EnemyRectangle.ColorShown;
+			context.fillStyle = this.colorShown;
 			break;
 		case GameRectangle.STATE_DEAD:
 		case GameRectangle.STATE_DYING:
@@ -109,7 +110,7 @@ EnemyRectangle.prototype.draw = function(context) {
 			if (this.misclickTimer > 0) {
 				context.fillStyle = EnemyRectangle.ColorHidden;
 			} else {
-				context.fillStyle = EnemyRectangle.ColorShown;
+				context.fillStyle = this.colorShown;
 			}
 			break;
 	}

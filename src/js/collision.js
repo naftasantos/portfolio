@@ -68,9 +68,16 @@ Collision.adjustPosition = function(rect, other, lastPos, gameTime) {
     rect.pos = result;
 }
 
-Collision.getReflection = function(rectA, rectB, direction) {
+Collision.getResultingCollisionForce = function(rectA, rectB, direction) {
+    var result = rectB.direction.add(rectA.direction);
+    var invertA = rectA.direction.multiply(-1);
+    var invertB = rectB.direction.multiply(-1);
+
+    return invertB.add(result).unit();
+
+
     // detecting which face has it collided with
-    var collidedLine = Collision.getNearestToCollisionFace(rectA, rectB);
+    /*var collidedLine = Collision.getNearestToCollisionFace(rectA, rectB);
 
     if (collidedLine != null) {
         // calculating the normal of the collided line
@@ -86,7 +93,7 @@ Collision.getReflection = function(rectA, rectB, direction) {
         console.log("Something is wrong. No face collided. =/");
     }
 
-    return null;
+    return null;*/
 };
 
 Collision.getNearestToCollisionFace = function(rectA, rectB) {

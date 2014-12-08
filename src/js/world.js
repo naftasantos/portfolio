@@ -126,17 +126,19 @@ World.prototype.update = function(gameTime) {
 							if (Collision.collidesWithRect(tmpEnemy, enemy)) {
 								Collision.adjustPosition(enemy, tmpEnemy, lastPos, gameTime);
 
-								var reflection = Collision.getReflection(tmpEnemy, enemy, enemy.direction);
+								var reflectionA = Collision.getResultingCollisionForce(tmpEnemy, enemy, enemy.direction);
+								var reflectionB = Collision.getResultingCollisionForce(enemy, tmpEnemy, tmpEnemy.direction);
 
-								if (reflection != null) {
-									enemy.direction = reflection;
+								if (reflectionA != null) {
+									enemy.direction = reflectionA;
 								}
 
-								reflection = Collision.getReflection(enemy, tmpEnemy, tmpEnemy.direction);
-
-								if (reflection != null) {
-									tmpEnemy.direction = reflection;
+								if (reflectionB != null) {
+									tmpEnemy.direction = reflectionB;
 								}
+
+								enemy.colorShown 	= this.getRandomColor();
+								tmpEnemy.colorShown = this.getRandomColor();	
 							}
 						}
 					}
@@ -231,3 +233,12 @@ World.prototype.randomEnemyTimeout = function(){
 	// from 1 to 2 seconds
 	return Math.ceil(Math.random() * 2);
 };
+
+World.prototype.getRandomColor = function() {
+	var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
