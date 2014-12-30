@@ -7,6 +7,9 @@ function World(canvas){
 	this.highscore = -1;
 	this.wasMouseDown = false;
 	this.resetGame();
+
+	this.bgMusic = new Audio('audio/bgmusic.ogg');
+	this.bgMusic.loop = true;
 };
 
 World.STATE_GAME 		= "WORLD_StateGame";
@@ -76,6 +79,8 @@ World.prototype.update = function(gameTime) {
 					if (!this.firstHit) {
 						this.dotRect.state = GameRectangle.STATE_NORMAL;
 						this.firstHit = true;
+						this.bgMusic.currentTime = 0;
+						this.bgMusic.play();
 					}
 				} else if (rect.state == GameRectangle.STATE_DEAD) {
 					this.randomRects.splice(idx, 1);
@@ -205,6 +210,7 @@ World.prototype.draw = function(context) {
 };
 
 World.prototype.gameOver = function() {
+	this.bgMusic.pause();
 	this.saveScore();
 
 	if (this.points > this.highscore) {
