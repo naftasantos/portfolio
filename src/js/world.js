@@ -6,10 +6,13 @@ function World(canvas){
 	this.fps = 0;
 	this.highscore = -1;
 	this.wasMouseDown = false;
-	this.resetGame();
-
+	
+	this.fadeCounter = 0;
 	this.bgMusic = new Audio('audio/bgmusic.ogg');
+	this.bgMusic.volume = 0;
 	this.bgMusic.loop = true;
+
+	this.resetGame();
 };
 
 World.STATE_GAME 		= "WORLD_StateGame";
@@ -79,8 +82,11 @@ World.prototype.update = function(gameTime) {
 					if (!this.firstHit) {
 						this.dotRect.state = GameRectangle.STATE_NORMAL;
 						this.firstHit = true;
-						this.bgMusic.currentTime = 0;
-						this.bgMusic.play();
+
+						if(this.bgMusic.volume == 0) {
+							this.bgMusic.currentTime = 0;
+							this.bgMusic.play();
+						}
 					}
 				} else if (rect.state == GameRectangle.STATE_DEAD) {
 					this.randomRects.splice(idx, 1);
@@ -95,6 +101,15 @@ World.prototype.update = function(gameTime) {
 					this.enemies.push(EnemyRectangle.createRandomRectangle(this.canvas));
 					this.enemyTimeoutCounter = this.randomEnemyTimeout();
 				}
+
+				if(this.fadeCounter < this.fadeTime) {
+					this.fadeCounter += gameTime.time;
+				} 
+				if (this.fadeCounter > this.fadeTime){
+					this.fadeCounter = this.fadeTime;
+				}
+				console.log(this.fadeCounter);
+				this.bgMusic.volume = this.fadeCounter / this.fadeTime;
 			}
 
 			var enemiesLen = this.enemies.length;
@@ -155,6 +170,19 @@ World.prototype.update = function(gameTime) {
 			}
 			break;
 		case World.STATE_GAME_OVER:
+			if(this.fadeCounter > 0) {
+				this.fadeCounter -= gameTime.time;
+			} 
+			if (this.fadeCounter < 0) {
+				this.fadeCounter = 0;
+			}
+
+			if(this.fadeCounter == 0) {
+				this.bgMusic.pause();
+			}
+
+			this.bgMusic.volume = this.fadeCounter / this.fadeTime;
+
 			if (Input.KeysDown[Input.ENTER]) {
 				this.resetGame();
 			} else if (this.wasMouseDown && !Input.IS_MOUSE_DOWN) {
@@ -210,7 +238,6 @@ World.prototype.draw = function(context) {
 };
 
 World.prototype.gameOver = function() {
-	this.bgMusic.pause();
 	this.saveScore();
 
 	if (this.points > this.highscore) {
@@ -225,6 +252,7 @@ World.prototype.resetGame = function() {
 	this.points 		= 0;
 	this.misclicktimer 	= 0;
 	this.firstHit		= false;
+	this.fadeTime		= 1; // seconds
 	this.enemyTimeoutCounter = this.randomEnemyTimeout();
 
 	this.state 			= World.STATE_GAME;
